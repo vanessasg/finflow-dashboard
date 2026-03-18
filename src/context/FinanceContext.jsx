@@ -1,3 +1,5 @@
+// src/context/FinanceContext.jsx
+
 import { createContext, useContext, useState } from "react";
 import {
   transactions as initialTransactions,
@@ -16,9 +18,16 @@ export const FinanceProvider = ({ children }) => {
     const transaction = {
       ...newTransaction,
       id: transactions.length + 1,
-      status: "completata",
     };
     setTransactions((prev) => [transaction, ...prev]);
+  };
+
+  const editTransaction = (updatedTransaction) => {
+    setTransactions((prev) =>
+      prev.map((t) =>
+        t.id === updatedTransaction.id ? updatedTransaction : t,
+      ),
+    );
   };
 
   return (
@@ -26,6 +35,7 @@ export const FinanceProvider = ({ children }) => {
       value={{
         transactions,
         addTransaction,
+        editTransaction,
         kpiData,
         monthlyData,
         budgetCategories,

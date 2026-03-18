@@ -1,4 +1,4 @@
-// tabella, filtri e form
+// src/pages/Transactions.jsx
 
 import { useState } from "react";
 import { useFinance } from "../context/FinanceContext";
@@ -18,21 +18,148 @@ const categories = [
   "Operativo",
   "Legale",
 ];
+const statuses = ["completata", "in attesa"];
 
 const emptyForm = {
   date: "",
   description: "",
   category: "Operativo",
   amount: "",
+  status: "completata",
 };
 
+const validate = (form) => {
+  const errors = {};
+  if (!form.date) errors.date = "Data obbligatoria";
+  if (!form.description.trim()) errors.description = "Descrizione obbligatoria";
+  if (!form.amount || isNaN(form.amount)) errors.amount = "Importo non valido";
+  return errors;
+};
+
+const TransactionForm = ({
+  form,
+  onChange,
+  onSubmit,
+  onCancel,
+  errors,
+  submitLabel,
+}) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 items-end">
+    {/* Data */}
+    <div>
+      <label className="text-xs text-gray-400 mb-1 block">Data</label>
+      <input
+        type="date"
+        name="date"
+        value={form.date}
+        onChange={onChange}
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+      />
+      {errors.date && (
+        <p className="text-xs text-red-400 mt-1">{errors.date}</p>
+      )}
+    </div>
+
+    {/* Descrizione */}
+    <div>
+      <label className="text-xs text-gray-400 mb-1 block">Descrizione</label>
+      <input
+        type="text"
+        name="description"
+        value={form.description}
+        onChange={onChange}
+        placeholder="es. Abbonamento tool"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+      />
+      {errors.description && (
+        <p className="text-xs text-red-400 mt-1">{errors.description}</p>
+      )}
+    </div>
+
+    {/* Categoria */}
+    <div>
+      <label className="text-xs text-gray-400 mb-1 block">Categoria</label>
+      <select
+        name="category"
+        value={form.category}
+        onChange={onChange}
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+      >
+        {categories
+          .filter((c) => c !== "Tutte")
+          .map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+      </select>
+    </div>
+
+    {/* Importo */}
+    <div>
+      <label className="text-xs text-gray-400 mb-1 block">
+        Importo (negativo = spesa)
+      </label>
+      <input
+        type="number"
+        name="amount"
+        value={form.amount}
+        onChange={onChange}
+        placeholder="es. -1500 o 5000"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+      />
+      {errors.amount && (
+        <p className="text-xs text-red-400 mt-1">{errors.amount}</p>
+      )}
+    </div>
+
+    {/* Stato */}
+    <div>
+      <label className="text-xs text-gray-400 mb-1 block">Stato</label>
+      <select
+        name="status"
+        value={form.status}
+        onChange={onChange}
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+      >
+        {statuses.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Buttons */}
+    <div className="sm:col-span-2 xl:col-span-5 flex justify-end gap-2">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="text-gray-400 hover:text-white text-sm px-4 py-2 rounded-lg transition-colors"
+      >
+        Annulla
+      </button>
+      <button
+        type="button"
+        onClick={onSubmit}
+        className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
+      >
+        {submitLabel}
+      </button>
+    </div>
+  </div>
+);
+
 const Transactions = () => {
-  const { transactions, addTransaction } = useFinance();
+  const { transactions, addTransaction, editTransaction } = useFinance();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Tutte");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
-  const [errors, setErrors] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editErrors, setEditErrors] = useState({});
 
   // Filtri
   const filtered = transactions.filter((t) => {
@@ -44,36 +171,48 @@ const Transactions = () => {
     return matchSearch && matchCategory;
   });
 
-  // Validazione form
-  const validate = () => {
-    const newErrors = {};
-    if (!form.date) newErrors.date = "Data obbligatoria";
-    if (!form.description.trim())
-      newErrors.description = "Descrizione obbligatoria";
-    if (!form.amount || isNaN(form.amount))
-      newErrors.amount = "Importo non valido";
-    return newErrors;
+  // --- Crea ---
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setFormErrors({ ...formErrors, [e.target.name]: undefined });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+  const handleSubmit = () => {
+    const errors = validate(form);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
-    addTransaction({
-      ...form,
-      amount: parseFloat(form.amount),
-    });
+    addTransaction({ ...form, amount: parseFloat(form.amount) });
     setForm(emptyForm);
-    setErrors({});
+    setFormErrors({});
     setShowForm(false);
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: undefined });
+  // --- Espandi / Edit ---
+  const handleRowClick = (t) => {
+    if (expandedId === t.id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(t.id);
+      setEditForm({ ...t });
+      setEditErrors({});
+    }
+  };
+
+  const handleEditChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    setEditErrors({ ...editErrors, [e.target.name]: undefined });
+  };
+
+  const handleEditSubmit = () => {
+    const errors = validate(editForm);
+    if (Object.keys(errors).length > 0) {
+      setEditErrors(errors);
+      return;
+    }
+    editTransaction({ ...editForm, amount: parseFloat(editForm.amount) });
+    setExpandedId(null);
   };
 
   return (
@@ -82,114 +221,39 @@ const Transactions = () => {
       <div className="flex items-center justify-between">
         <p className="text-gray-400 text-sm">{filtered.length} transazioni</p>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            setShowForm(!showForm);
+            setExpandedId(null);
+          }}
           className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           {showForm ? "Annulla" : "+ Nuova Transazione"}
         </button>
       </div>
 
-      {/* Form */}
+      {/* Form creazione */}
       {showForm && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-gray-300 mb-4">
             Nuova Transazione
           </h3>
-          <form
+          <TransactionForm
+            form={form}
+            onChange={handleChange}
             onSubmit={handleSubmit}
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
-          >
-            {/* Data */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">Data</label>
-              <input
-                type="date"
-                name="date"
-                value={form.date}
-                onChange={handleChange}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
-              />
-              {errors.date && (
-                <p className="text-xs text-red-400 mt-1">{errors.date}</p>
-              )}
-            </div>
-
-            {/* Descrizione */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">
-                Descrizione
-              </label>
-              <input
-                type="text"
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                placeholder="es. Abbonamento tool"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-              />
-              {errors.description && (
-                <p className="text-xs text-red-400 mt-1">
-                  {errors.description}
-                </p>
-              )}
-            </div>
-
-            {/* Categoria */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">
-                Categoria
-              </label>
-              <select
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
-              >
-                {categories
-                  .filter((c) => c !== "Tutte")
-                  .map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            {/* Importo */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">
-                Importo (negativo = spesa)
-              </label>
-              <input
-                type="number"
-                name="amount"
-                value={form.amount}
-                onChange={handleChange}
-                placeholder="es. -1500 o 5000"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-              />
-              {errors.amount && (
-                <p className="text-xs text-red-400 mt-1">{errors.amount}</p>
-              )}
-            </div>
-
-            {/* Submit */}
-            <div className="sm:col-span-2 xl:col-span-4 flex justify-end">
-              <button
-                type="submit"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
-              >
-                Aggiungi
-              </button>
-            </div>
-          </form>
+            onCancel={() => {
+              setShowForm(false);
+              setFormErrors({});
+            }}
+            errors={formErrors}
+            submitLabel="Aggiungi"
+          />
         </div>
       )}
 
-      {/* Filtri */}
+      {/* Filtri + Tabella */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
           <input
             type="text"
             placeholder="Cerca transazione..."
@@ -197,7 +261,6 @@ const Transactions = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
           />
-          {/* Category filter */}
           <div className="flex gap-2 flex-wrap">
             {categories.map((c) => (
               <button
@@ -215,18 +278,17 @@ const Transactions = () => {
           </div>
         </div>
 
-        {/* Tabella */}
         <table className="w-full text-sm">
           <thead>
             <tr className="text-gray-500 border-b border-gray-800">
-              <th className="text-left pb-3 font-medium">Data</th>
+              <th className="text-left pb-3 ps-3 font-medium">Data</th>
               <th className="text-left pb-3 font-medium">Descrizione</th>
               <th className="text-left pb-3 font-medium">Categoria</th>
               <th className="text-left pb-3 font-medium">Stato</th>
-              <th className="text-right pb-3 font-medium">Importo</th>
+              <th className="text-right pb-3 pe-3 font-medium">Importo</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody>
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-gray-500">
@@ -235,27 +297,54 @@ const Transactions = () => {
               </tr>
             ) : (
               filtered.map((t) => (
-                <tr
-                  key={t.id}
-                  className="hover:bg-gray-800/50 transition-colors"
-                >
-                  <td className="py-3 text-gray-400">{t.date}</td>
-                  <td className="py-3 text-white">{t.description}</td>
-                  <td className="py-3">
-                    <StatBadge label={t.category} color="indigo" />
-                  </td>
-                  <td className="py-3">
-                    <StatBadge
-                      label={t.status}
-                      color={t.status === "completata" ? "green" : "yellow"}
-                    />
-                  </td>
-                  <td
-                    className={`py-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
+                <>
+                  {/* Riga */}
+                  <tr
+                    key={t.id}
+                    onClick={() => handleRowClick(t)}
+                    className={`border-t border-gray-800 cursor-pointer transition-colors px-3 ${
+                      expandedId === t.id
+                        ? "bg-gray-800/70"
+                        : "hover:bg-gray-800/50"
+                    }`}
                   >
-                    {formatCurrency(t.amount)}
-                  </td>
-                </tr>
+                    <td className="py-3 ps-3 text-gray-400">{t.date}</td>
+                    <td className="py-3 text-white">{t.description}</td>
+                    <td className="py-3">
+                      <StatBadge label={t.category} color="indigo" />
+                    </td>
+                    <td className="py-3">
+                      <StatBadge
+                        label={t.status}
+                        color={t.status === "completata" ? "green" : "yellow"}
+                      />
+                    </td>
+                    <td
+                      className={`py-3 pe-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {formatCurrency(t.amount)}
+                    </td>
+                  </tr>
+
+                  {/* Riga espansa */}
+                  {expandedId === t.id && (
+                    <tr
+                      key={`edit-${t.id}`}
+                      className="bg-gray-800/40 border-t border-gray-700"
+                    >
+                      <td colSpan={5} className="px-4 py-4">
+                        <TransactionForm
+                          form={editForm}
+                          onChange={handleEditChange}
+                          onSubmit={handleEditSubmit}
+                          onCancel={() => setExpandedId(null)}
+                          errors={editErrors}
+                          submitLabel="Salva modifiche"
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))
             )}
           </tbody>

@@ -24,7 +24,7 @@ const TopBar = () => {
       <div className="flex items-center gap-4">
         <span className="text-sm text-gray-400 capitalize">{today}</span>
         <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold">
-          N
+          V
         </div>
       </div>
     </header>
