@@ -6,8 +6,9 @@ import {
   faArrowRightArrowLeft,
   faWallet,
   faXmark,
-  faChevronLeft,
-  faChevronRight,
+  faCaretLeft,
+  faCaretRight,
+
 } from "@fortawesome/free-solid-svg-icons";
 import { faBitcoin } from "@fortawesome/free-brands-svg-icons";
 
@@ -43,11 +44,11 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
         {/* Toggle desktop */}
         <button
           onClick={onToggle}
-          className="hidden md:flex text-gray-400 hover:text-white transition-colors ml-auto"
+          className={`hidden md:flex text-gray-400 hover:text-white transition-colors ${isOpen ? "ml-auto": "mx-auto"}`}
         >
           <FontAwesomeIcon
-            icon={isOpen ? faChevronLeft : faChevronRight}
-            className="w-4 h-4"
+            icon={isOpen ? faCaretLeft : faCaretRight}
+            className="!w-5 !h-5"
           />
         </button>
 
