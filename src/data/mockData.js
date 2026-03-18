@@ -1,7 +1,5 @@
-// src/data/mockData.js
-
 export const companyInfo = {
-  name: "NordVault Capital",
+  name: "Arcum Finance S.r.l.",
   currency: "€",
   fiscalYear: 2025,
 };
