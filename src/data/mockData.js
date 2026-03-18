@@ -43,6 +43,7 @@ export const transactions = [
     category: "IT",
     amount: -2400,
     status: "completata",
+    protected: true,
   },
   {
     id: 2,
@@ -51,6 +52,7 @@ export const transactions = [
     category: "Entrata",
     amount: 18500,
     status: "completata",
+    protected: true,
   },
   {
     id: 3,
@@ -75,6 +77,7 @@ export const transactions = [
     category: "Entrata",
     amount: 31000,
     status: "completata",
+    protected: true,
   },
   {
     id: 6,
@@ -99,6 +102,7 @@ export const transactions = [
     category: "Entrata",
     amount: 24700,
     status: "completata",
+    protected: true,
   },
   {
     id: 9,
@@ -131,6 +135,7 @@ export const transactions = [
     category: "HR",
     amount: -4100,
     status: "completata",
+    protected: true,
   },
   {
     id: 13,

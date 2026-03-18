@@ -6,6 +6,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -74,6 +75,16 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
+  // Elimina
+  const deleteTransaction = async (id) => {
+    try {
+      await deleteDoc(doc(db, "transactions", id));
+      setTransactions((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      console.error("Errore deleteTransaction:", err);
+    }
+  };
+
   return (
     <FinanceContext.Provider
       value={{
@@ -81,6 +92,7 @@ export const FinanceProvider = ({ children }) => {
         loading,
         addTransaction,
         editTransaction,
+        deleteTransaction,
         kpiData,
         monthlyData,
         budgetCategories,

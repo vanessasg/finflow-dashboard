@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { useFinance } from "../context/FinanceContext";
 import StatBadge from "../components/ui/StatBadge";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faBan } from "@fortawesome/free-solid-svg-icons";
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(
@@ -149,7 +152,7 @@ const TransactionForm = ({
 );
 
 const Transactions = () => {
-  const { transactions, loading, addTransaction, editTransaction } =
+  const { transactions, loading, addTransaction, editTransaction, deleteTransaction } =
     useFinance();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Tutte");
@@ -214,6 +217,11 @@ const Transactions = () => {
     setExpandedId(null);
   };
 
+  // --- Delete ---
+  const handleDelete = (id) => {
+    deleteTransaction(id);
+    if (expandedId === id) setExpandedId(null);
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -294,7 +302,8 @@ const Transactions = () => {
               <th className="text-left pb-3 font-medium">Descrizione</th>
               <th className="text-left pb-3 font-medium">Categoria</th>
               <th className="text-left pb-3 font-medium">Stato</th>
-              <th className="text-right pb-3 pe-3 font-medium">Importo</th>
+              <th className="text-right pb-3 font-medium">Importo</th>
+              <th className="pb-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -306,12 +315,11 @@ const Transactions = () => {
               </tr>
             ) : (
               filtered.map((t) => (
-                <>
+                <Fragment key={t.id}>
                   {/* Riga */}
                   <tr
-                    key={t.id}
                     onClick={() => handleRowClick(t)}
-                    className={`border-t border-gray-800 cursor-pointer transition-colors px-3 ${
+                    className={`border-t border-gray-800 cursor-pointer transition-colors ${
                       expandedId === t.id
                         ? "bg-gray-800/70"
                         : "hover:bg-gray-800/50"
@@ -329,19 +337,42 @@ const Transactions = () => {
                       />
                     </td>
                     <td
-                      className={`py-3 pe-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
+                      className={`py-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
                     >
                       {formatCurrency(t.amount)}
+                    </td>
+                    <td
+                      className="py-3 text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="relative group inline-block">
+                        <button
+                          onClick={() => !t.protected && handleDelete(t.id)}
+                          className={`text-xs px-2 py-1 rounded transition-colors ${
+                            t.protected
+                              ? "text-gray-700 cursor-not-allowed"
+                              : "text-gray-600 hover:text-red-400 cursor-pointer"
+                          }`}
+                        >
+                          <FontAwesomeIcon
+                            icon={t.protected ? faBan : faTrash}
+                          />
+                        </button>
+                        <div className="absolute right-0 bottom-full mb-1 hidden group-hover:block z-10">
+                          <span className="bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700">
+                            {t.protected
+                              ? "Transazione protetta"
+                              : "Elimina transazione"}
+                          </span>
+                        </div>
+                      </div>
                     </td>
                   </tr>
 
                   {/* Riga espansa */}
                   {expandedId === t.id && (
-                    <tr
-                      key={`edit-${t.id}`}
-                      className="bg-gray-800/40 border-t border-gray-700"
-                    >
-                      <td colSpan={5} className="px-4 py-4">
+                    <tr className="bg-gray-800/40 border-t border-gray-700">
+                      <td colSpan={6} className="px-4 py-4">
                         <TransactionForm
                           form={editForm}
                           onChange={handleEditChange}
@@ -353,7 +384,7 @@ const Transactions = () => {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))
             )}
           </tbody>

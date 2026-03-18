@@ -148,20 +148,20 @@ const Dashboard = () => {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-gray-500 border-b border-gray-800">
-              <th className="text-left pb-3 font-medium">Data</th>
+              <th className="text-left pb-3 ps-3 font-medium">Data</th>
               <th className="text-left pb-3 font-medium">Descrizione</th>
               <th className="text-left pb-3 font-medium">Categoria</th>
-              <th className="text-right pb-3 font-medium">Importo</th>
+              <th className="text-right pb-3 pe-3 font-medium">Importo</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
             {recentTransactions.map((t) => (
               <tr key={t.id} className="hover:bg-gray-800/50 transition-colors">
-                <td className="py-3 text-gray-400">{t.date}</td>
+                <td className="py-3 ps-3 text-gray-400">{t.date}</td>
                 <td className="py-3 text-white">{t.description}</td>
                 <td className="py-3 text-gray-400">{t.category}</td>
                 <td
-                  className={`py-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
+                  className={`py-3 text-right pe-3 font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
                 >
                   {formatCurrency(t.amount)}
                 </td>
