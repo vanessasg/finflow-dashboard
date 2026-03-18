@@ -8,7 +8,7 @@
 
 ## 📸 Overview
 
-FinFlow è una dashboard finanziaria per un'azienda fittizia (**NordVault Capital**), progettata per monitorare entrate, spese, budget e criptovalute in tempo reale. Il progetto nasce come showcase delle principali funzionalità di React in un contesto professionale e realistico.
+FinFlow è una dashboard finanziaria per un'azienda fittizia, progettata per monitorare entrate, spese, budget e criptovalute in tempo reale. Il progetto nasce come showcase delle principali funzionalità di React in un contesto professionale e realistico.
 
 ---
 
