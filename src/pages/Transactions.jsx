@@ -5,6 +5,8 @@ import StatBadge from "../components/ui/StatBadge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faBan } from "@fortawesome/free-solid-svg-icons";
 
+import Swal from "sweetalert2";
+
 const formatCurrency = (value) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(
     value,
@@ -219,9 +221,47 @@ const Transactions = () => {
 
   // --- Delete ---
   const handleDelete = (id) => {
-    deleteTransaction(id);
-    if (expandedId === id) setExpandedId(null);
+    Swal.fire({
+      title: "Eliminare la transazione?",
+      text: "Questa azione non può essere annullata.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sì, elimina",
+      cancelButtonText: "Annulla",
+      background: "#111827",
+      color: "#f9fafb",
+      iconColor: "#f43f5e",
+      confirmButtonColor: "#f43f5e",
+      cancelButtonColor: "#374151",
+      customClass: {
+        popup: "!rounded-xl",
+        confirmButton: "!rounded-lg",
+        cancelButton: "!rounded-lg",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteTransaction(id);
+        if (expandedId === id) setExpandedId(null);
+        Swal.fire({
+          title: "Eliminata!",
+          text: "La transazione è stata eliminata.",
+          icon: "success",
+          background: "#111827",
+          color: "#f9fafb",
+          iconColor: "#10b981",
+          confirmButtonColor: "#6366f1",
+          timer: 1500,
+          showConfirmButton: false,
+          customClass: {
+            popup: "!rounded-xl",
+            confirmButton: "!rounded-lg",
+            cancelButton: "!rounded-lg",
+          },
+        });
+      }
+    });
   };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -295,100 +335,102 @@ const Transactions = () => {
           </div>
         </div>
 
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-gray-500 border-b border-gray-800">
-              <th className="text-left pb-3 ps-3 font-medium">Data</th>
-              <th className="text-left pb-3 font-medium">Descrizione</th>
-              <th className="text-left pb-3 font-medium">Categoria</th>
-              <th className="text-left pb-3 font-medium">Stato</th>
-              <th className="text-right pb-3 font-medium">Importo</th>
-              <th className="pb-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="py-8 text-center text-gray-500">
-                  Nessuna transazione trovata
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-160">
+            <thead>
+              <tr className="text-gray-500 border-b border-gray-800">
+                <th className="text-left pb-3 ps-3 font-medium">Data</th>
+                <th className="text-left pb-3 font-medium">Descrizione</th>
+                <th className="text-left pb-3 font-medium">Categoria</th>
+                <th className="text-left pb-3 font-medium">Stato</th>
+                <th className="text-right pb-3 font-medium">Importo</th>
+                <th className="pb-3"></th>
               </tr>
-            ) : (
-              filtered.map((t) => (
-                <Fragment key={t.id}>
-                  {/* Riga */}
-                  <tr
-                    onClick={() => handleRowClick(t)}
-                    className={`border-t border-gray-800 cursor-pointer transition-colors ${
-                      expandedId === t.id
-                        ? "bg-gray-800/70"
-                        : "hover:bg-gray-800/50"
-                    }`}
-                  >
-                    <td className="py-3 ps-3 text-gray-400">{t.date}</td>
-                    <td className="py-3 text-white">{t.description}</td>
-                    <td className="py-3">
-                      <StatBadge label={t.category} color="indigo" />
-                    </td>
-                    <td className="py-3">
-                      <StatBadge
-                        label={t.status}
-                        color={t.status === "completata" ? "green" : "yellow"}
-                      />
-                    </td>
-                    <td
-                      className={`py-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
+                    Nessuna transazione trovata
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((t) => (
+                  <Fragment key={t.id}>
+                    {/* Riga */}
+                    <tr
+                      onClick={() => handleRowClick(t)}
+                      className={`border-t border-gray-800 cursor-pointer transition-colors ${
+                        expandedId === t.id
+                          ? "bg-gray-800/70"
+                          : "hover:bg-gray-800/50"
+                      }`}
                     >
-                      {formatCurrency(t.amount)}
-                    </td>
-                    <td
-                      className="py-3 text-right"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="relative group inline-block">
-                        <button
-                          onClick={() => !t.protected && handleDelete(t.id)}
-                          className={`text-xs px-2 py-1 rounded transition-colors ${
-                            t.protected
-                              ? "text-gray-700 cursor-not-allowed"
-                              : "text-gray-600 hover:text-red-400 cursor-pointer"
-                          }`}
-                        >
-                          <FontAwesomeIcon
-                            icon={t.protected ? faBan : faTrash}
-                          />
-                        </button>
-                        <div className="absolute right-0 bottom-full mb-1 hidden group-hover:block z-10">
-                          <span className="bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700">
-                            {t.protected
-                              ? "Transazione protetta"
-                              : "Elimina transazione"}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Riga espansa */}
-                  {expandedId === t.id && (
-                    <tr className="bg-gray-800/40 border-t border-gray-700">
-                      <td colSpan={6} className="px-4 py-4">
-                        <TransactionForm
-                          form={editForm}
-                          onChange={handleEditChange}
-                          onSubmit={handleEditSubmit}
-                          onCancel={() => setExpandedId(null)}
-                          errors={editErrors}
-                          submitLabel="Salva modifiche"
+                      <td className="py-3 ps-3 text-gray-400">{t.date}</td>
+                      <td className="py-3 text-white">{t.description}</td>
+                      <td className="py-3">
+                        <StatBadge label={t.category} color="indigo" />
+                      </td>
+                      <td className="py-3">
+                        <StatBadge
+                          label={t.status}
+                          color={t.status === "completata" ? "green" : "yellow"}
                         />
                       </td>
+                      <td
+                        className={`py-3 text-right font-medium ${t.amount >= 0 ? "text-green-400" : "text-red-400"}`}
+                      >
+                        {formatCurrency(t.amount)}
+                      </td>
+                      <td
+                        className="py-3 text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="relative group inline-block">
+                          <button
+                            onClick={() => !t.protected && handleDelete(t.id)}
+                            className={`text-xs px-2 py-1 rounded transition-colors ${
+                              t.protected
+                                ? "text-gray-700 cursor-not-allowed"
+                                : "text-gray-600 hover:text-red-400 cursor-pointer"
+                            }`}
+                          >
+                            <FontAwesomeIcon
+                              icon={t.protected ? faBan : faTrash}
+                            />
+                          </button>
+                          <div className="absolute right-0 bottom-full mb-1 hidden group-hover:block z-10">
+                            <span className="bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700">
+                              {t.protected
+                                ? "Transazione protetta"
+                                : "Elimina transazione"}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
                     </tr>
-                  )}
-                </Fragment>
-              ))
-            )}
-          </tbody>
-        </table>
+
+                    {/* Riga espansa */}
+                    {expandedId === t.id && (
+                      <tr className="bg-gray-800/40 border-t border-gray-700">
+                        <td colSpan={6} className="px-4 py-4">
+                          <TransactionForm
+                            form={editForm}
+                            onChange={handleEditChange}
+                            onSubmit={handleEditSubmit}
+                            onCancel={() => setExpandedId(null)}
+                            errors={editErrors}
+                            submitLabel="Salva modifiche"
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
