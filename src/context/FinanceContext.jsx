@@ -1,39 +1,84 @@
 // src/context/FinanceContext.jsx
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import {
-  transactions as initialTransactions,
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../firebase";
+import {
   kpiData,
   monthlyData,
   budgetCategories,
   companyInfo,
 } from "../data/mockData";
+import { seedTransactions } from "../utils/seedFirestore";
 
 const FinanceContext = createContext();
 
 export const FinanceProvider = ({ children }) => {
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const addTransaction = (newTransaction) => {
-    const transaction = {
-      ...newTransaction,
-      id: transactions.length + 1,
+  // Leggi da Firestore al mount
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        await seedTransactions(); // popola solo se vuoto
+        const snapshot = await getDocs(collection(db, "transactions"));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setTransactions(data);
+      } catch (err) {
+        console.error("Errore fetch transactions:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    setTransactions((prev) => [transaction, ...prev]);
+
+    fetchTransactions();
+  }, []);
+
+  // Aggiungi
+  const addTransaction = async (newTransaction) => {
+    try {
+      const docRef = await addDoc(
+        collection(db, "transactions"),
+        newTransaction,
+      );
+      setTransactions((prev) => [
+        { id: docRef.id, ...newTransaction },
+        ...prev,
+      ]);
+    } catch (err) {
+      console.error("Errore addTransaction:", err);
+    }
   };
 
-  const editTransaction = (updatedTransaction) => {
-    setTransactions((prev) =>
-      prev.map((t) =>
-        t.id === updatedTransaction.id ? updatedTransaction : t,
-      ),
-    );
+  // Modifica
+  const editTransaction = async (updatedTransaction) => {
+    try {
+      const { id, ...data } = updatedTransaction;
+      await updateDoc(doc(db, "transactions", id), data);
+      setTransactions((prev) =>
+        prev.map((t) => (t.id === id ? updatedTransaction : t)),
+      );
+    } catch (err) {
+      console.error("Errore editTransaction:", err);
+    }
   };
 
   return (
     <FinanceContext.Provider
       value={{
         transactions,
+        loading,
         addTransaction,
         editTransaction,
         kpiData,

@@ -1,5 +1,3 @@
-// src/pages/Transactions.jsx
-
 import { useState } from "react";
 import { useFinance } from "../context/FinanceContext";
 import StatBadge from "../components/ui/StatBadge";
@@ -151,7 +149,8 @@ const TransactionForm = ({
 );
 
 const Transactions = () => {
-  const { transactions, addTransaction, editTransaction } = useFinance();
+  const { transactions, loading, addTransaction, editTransaction } =
+    useFinance();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Tutte");
   const [showForm, setShowForm] = useState(false);
@@ -214,6 +213,16 @@ const Transactions = () => {
     editTransaction({ ...editForm, amount: parseFloat(editForm.amount) });
     setExpandedId(null);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-400 text-sm animate-pulse">
+          Caricamento transazioni...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
