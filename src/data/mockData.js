@@ -1,0 +1,161 @@
+// src/data/mockData.js
+
+export const companyInfo = {
+  name: "NordVault Capital",
+  currency: "€",
+  fiscalYear: 2025,
+};
+
+export const kpiData = {
+  totalRevenue: 847200,
+  totalExpenses: 612400,
+  netProfit: 234800,
+  cashFlow: 189300,
+};
+
+export const monthlyData = [
+  { month: "Gen", revenue: 62000, expenses: 48000 },
+  { month: "Feb", revenue: 58000, expenses: 45000 },
+  { month: "Mar", revenue: 71000, expenses: 52000 },
+  { month: "Apr", revenue: 69000, expenses: 50000 },
+  { month: "Mag", revenue: 75000, expenses: 55000 },
+  { month: "Giu", revenue: 80000, expenses: 58000 },
+  { month: "Lug", revenue: 72000, expenses: 54000 },
+  { month: "Ago", revenue: 65000, expenses: 49000 },
+  { month: "Set", revenue: 78000, expenses: 57000 },
+  { month: "Ott", revenue: 83000, expenses: 61000 },
+  { month: "Nov", revenue: 88000, expenses: 63000 },
+  { month: "Dic", revenue: 94000, expenses: 70000 },
+];
+
+export const budgetCategories = [
+  { category: "Marketing", allocated: 120000, spent: 98000 },
+  { category: "Operativo", allocated: 200000, spent: 187000 },
+  { category: "R&D", allocated: 150000, spent: 112000 },
+  { category: "HR", allocated: 90000, spent: 85000 },
+  { category: "IT", allocated: 80000, spent: 74000 },
+  { category: "Legale", allocated: 40000, spent: 31000 },
+];
+
+export const transactions = [
+  {
+    id: 1,
+    date: "2025-12-01",
+    description: "Abbonamento SaaS Tools",
+    category: "IT",
+    amount: -2400,
+    status: "completata",
+  },
+  {
+    id: 2,
+    date: "2025-12-02",
+    description: "Pagamento cliente Rossi S.p.A.",
+    category: "Entrata",
+    amount: 18500,
+    status: "completata",
+  },
+  {
+    id: 3,
+    date: "2025-12-03",
+    description: "Campagna Google Ads",
+    category: "Marketing",
+    amount: -5200,
+    status: "completata",
+  },
+  {
+    id: 4,
+    date: "2025-12-05",
+    description: "Stipendi Dicembre",
+    category: "HR",
+    amount: -42000,
+    status: "completata",
+  },
+  {
+    id: 5,
+    date: "2025-12-06",
+    description: "Pagamento cliente Bianchi Holding",
+    category: "Entrata",
+    amount: 31000,
+    status: "completata",
+  },
+  {
+    id: 6,
+    date: "2025-12-08",
+    description: "Affitto uffici Milano",
+    category: "Operativo",
+    amount: -8500,
+    status: "completata",
+  },
+  {
+    id: 7,
+    date: "2025-12-10",
+    description: "Consulenza legale",
+    category: "Legale",
+    amount: -3200,
+    status: "completata",
+  },
+  {
+    id: 8,
+    date: "2025-12-11",
+    description: "Pagamento cliente Ferrero Group",
+    category: "Entrata",
+    amount: 24700,
+    status: "completata",
+  },
+  {
+    id: 9,
+    date: "2025-12-13",
+    description: "Server AWS",
+    category: "IT",
+    amount: -1800,
+    status: "completata",
+  },
+  {
+    id: 10,
+    date: "2025-12-15",
+    description: "Fiera Internazionale",
+    category: "Marketing",
+    amount: -6800,
+    status: "in attesa",
+  },
+  {
+    id: 11,
+    date: "2025-12-17",
+    description: "Pagamento cliente Luxottica",
+    category: "Entrata",
+    amount: 41200,
+    status: "completata",
+  },
+  {
+    id: 12,
+    date: "2025-12-18",
+    description: "Formazione dipendenti",
+    category: "HR",
+    amount: -4100,
+    status: "completata",
+  },
+  {
+    id: 13,
+    date: "2025-12-20",
+    description: "Licenze software",
+    category: "IT",
+    amount: -3600,
+    status: "in attesa",
+  },
+  {
+    id: 14,
+    date: "2025-12-22",
+    description: "Pagamento cliente Pirelli",
+    category: "Entrata",
+    amount: 28900,
+    status: "completata",
+  },
+  {
+    id: 15,
+    date: "2025-12-28",
+    description: "Rimborso spese viaggi",
+    category: "Operativo",
+    amount: -2100,
+    status: "in attesa",
+  },
+];
