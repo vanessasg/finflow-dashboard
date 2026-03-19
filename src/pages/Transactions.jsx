@@ -56,7 +56,7 @@ const TransactionForm = ({
         name="date"
         value={form.date}
         onChange={onChange}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+        className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
       />
       {errors.date && (
         <p className="text-xs text-red-400 mt-1">{errors.date}</p>
@@ -72,7 +72,7 @@ const TransactionForm = ({
         value={form.description}
         onChange={onChange}
         placeholder="es. Abbonamento tool"
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+        className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
       />
       {errors.description && (
         <p className="text-xs text-red-400 mt-1">{errors.description}</p>
@@ -86,7 +86,7 @@ const TransactionForm = ({
         name="category"
         value={form.category}
         onChange={onChange}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 h-9.5 text-sm text-white focus:outline-none focus:border-indigo-500"
       >
         {categories
           .filter((c) => c !== "Tutte")
@@ -109,7 +109,7 @@ const TransactionForm = ({
         value={form.amount}
         onChange={onChange}
         placeholder="es. -1500 o 5000"
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+        className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
       />
       {errors.amount && (
         <p className="text-xs text-red-400 mt-1">{errors.amount}</p>
@@ -123,7 +123,7 @@ const TransactionForm = ({
         name="status"
         value={form.status}
         onChange={onChange}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 h-9.5 text-sm text-white focus:outline-none focus:border-indigo-500"
       >
         {statuses.map((s) => (
           <option key={s} value={s}>

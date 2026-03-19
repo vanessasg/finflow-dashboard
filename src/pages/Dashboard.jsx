@@ -19,7 +19,7 @@ const formatCurrency = (value) =>
   );
 
 const Dashboard = () => {
-  const { kpiData, monthlyData, transactions, companyInfo } = useFinance();
+  const { kpiData, monthlyData, transactions } = useFinance();
 
   const recentTransactions = transactions.slice(0, 5);
 

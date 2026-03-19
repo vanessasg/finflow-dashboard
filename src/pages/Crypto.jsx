@@ -43,7 +43,7 @@ const Crypto = () => {
         <p className="text-red-400 text-sm">{error}</p>
         <button
           onClick={refetch}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+          className="bg-indigo-600 hover:bg-indigo-700 cursor-pointer text-white text-sm px-4 py-2 rounded-lg transition-colors"
         >
           Riprova
         </button>
@@ -64,7 +64,7 @@ const Crypto = () => {
         </p>
         <button
           onClick={refetch}
-          className="bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm px-4 py-2 rounded-lg transition-colors"
+          className="bg-gray-800 hover:bg-gray-700 cursor-pointer text-gray-300 text-sm px-4 py-2 rounded-lg transition-colors"
         >
           ↻ Aggiorna
         </button>
@@ -129,59 +129,61 @@ const Crypto = () => {
         <h3 className="text-sm font-semibold text-gray-300 mb-4">
           Riepilogo Mercato
         </h3>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-gray-500 border-b border-gray-800">
-              <th className="text-left pb-3 font-medium">#</th>
-              <th className="text-left pb-3 font-medium">Nome</th>
-              <th className="text-right pb-3 font-medium">Prezzo</th>
-              <th className="text-right pb-3 font-medium">24h %</th>
-              <th className="text-right pb-3 font-medium">Market Cap</th>
-              <th className="text-right pb-3 font-medium">Volume 24h</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800">
-            {coins.map((coin, index) => {
-              const isPositive = coin.price_change_percentage_24h >= 0;
-              return (
-                <tr
-                  key={coin.id}
-                  className="hover:bg-gray-800/50 transition-colors"
-                >
-                  <td className="py-3 text-gray-500">{index + 1}</td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={coin.image}
-                        alt={coin.name}
-                        className="w-5 h-5"
-                      />
-                      <span className="text-white">{coin.name}</span>
-                      <span className="text-gray-500 uppercase text-xs">
-                        {coin.symbol}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3 text-right text-white">
-                    {formatCurrency(coin.current_price)}
-                  </td>
-                  <td
-                    className={`py-3 text-right font-medium ${isPositive ? "text-green-400" : "text-red-400"}`}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-160">
+            <thead>
+              <tr className="text-gray-500 border-b border-gray-800">
+                <th className="text-left pb-3 font-medium">#</th>
+                <th className="text-left pb-3 font-medium">Nome</th>
+                <th className="text-right pb-3 font-medium">Prezzo</th>
+                <th className="text-right pb-3 font-medium">24h %</th>
+                <th className="text-right pb-3 font-medium">Market Cap</th>
+                <th className="text-right pb-3 font-medium">Volume 24h</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {coins.map((coin, index) => {
+                const isPositive = coin.price_change_percentage_24h >= 0;
+                return (
+                  <tr
+                    key={coin.id}
+                    className="hover:bg-gray-800/50 transition-colors"
                   >
-                    {isPositive ? "▲" : "▼"}{" "}
-                    {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
-                  </td>
-                  <td className="py-3 text-right text-gray-300">
-                    {formatLarge(coin.market_cap)}
-                  </td>
-                  <td className="py-3 text-right text-gray-300">
-                    {formatLarge(coin.total_volume)}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    <td className="py-3 text-gray-500">{index + 1}</td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={coin.image}
+                          alt={coin.name}
+                          className="w-5 h-5"
+                        />
+                        <span className="text-white">{coin.name}</span>
+                        <span className="text-gray-500 uppercase text-xs">
+                          {coin.symbol}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 text-right text-white">
+                      {formatCurrency(coin.current_price)}
+                    </td>
+                    <td
+                      className={`py-3 text-right font-medium ${isPositive ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {isPositive ? "▲" : "▼"}{" "}
+                      {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
+                    </td>
+                    <td className="py-3 text-right text-gray-300">
+                      {formatLarge(coin.market_cap)}
+                    </td>
+                    <td className="py-3 text-right text-gray-300">
+                      {formatLarge(coin.total_volume)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
